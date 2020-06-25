@@ -1,7 +1,7 @@
 <updates>
     <update>
-        <name>plgJoomshoppingTwoLang</name>
-        <description><![CDATA[Search plugin joomshopping two languages update]]></description>
+        <name>plgSystemJoomshoppingSmartFilter</name>
+        <description><![CDATA[Search plugin Smart Filter update]]></description>
         <type>plugin</type>
         <folder>system</folder>
         <element>plg_system_joomshopping_smart_filter</element>
