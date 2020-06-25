@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" version="3.8" group="system" method="upgrade">
+	<name>PLG_SYSTEM_PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER</name>
+	<creationDate>25.06.2020</creationDate>
+	<author>Gartes</author>
+	<authorEmail>sad.net79@gmail.com</authorEmail>
+	<authorUrl> * </authorUrl>
+	<copyright>A copyright</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>1.0</version>
+	<description>PLG_SYSTEM_PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_XML_DESCRIPTION</description>
+
+	<!-- Scripts to run on installation -->
+	<scriptfile></scriptfile>
+
+	<!-- Plugin files -->
+	<files>
+		<folder>language</folder>
+		<filename plugin="plg_system_joomshopping_smart_filter">plg_system_joomshopping_smart_filter.php</filename>
+		<filename>README.md</filename>
+	</files>
+
+	<!-- Config parameter -->
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+
+			</fieldset>
+		</fields>
+	</config>
+
+	<!-- Update servers -->
+	<updateservers>
+		<server type="extension" priority="1" name="plg_system_joomshopping_smart_filter">https://www.example.com/plg_plg_system_joomshopping_smart_filter.xml</server>
+	</updateservers>
+</extension>
