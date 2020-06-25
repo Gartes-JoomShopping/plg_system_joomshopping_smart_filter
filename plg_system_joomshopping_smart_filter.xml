@@ -31,6 +31,12 @@
 
 	<!-- Update servers -->
 	<updateservers>
-		<server type="extension" priority="1" name="plg_system_joomshopping_smart_filter">https://www.example.com/plg_plg_system_joomshopping_smart_filter.xml</server>
+		<server type="extension" priority="1" name="plg_system_joomshopping_smart_filter">https://raw.githubusercontent.com/Gartes-JoomShopping/plg_system_joomshopping_smart_filter/master/plg_system_joomshopping_smart_filter_update.xml</server>
 	</updateservers>
 </extension>
+
+<!--
+INSALL :
+https://github.com/gartes/GNZ11/archive/master.zip
+https://github.com/Gartes-JoomShopping/plg_system_joomshopping_smart_filter/archive/master.zip - Установить и вклчить
+-->
