@@ -93,6 +93,10 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 	public function onAfterRender()
 	{
 
+		$Itemid = $this->app->input->get('Itemid' , false );
+		$format = $this->app->input->get('format' , false );
+		if( !$Itemid || $format ) return; #END IF
+
 //		if( !$this->checkGNZ11() ) return ; #END IF
 
 
@@ -229,7 +233,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 	 *
 	 * @since version
 	 */
-	public function onInstallerBeforeInstaller (\InstallerModelInstall $ModelInstall , &$package , $installer , &$result , &$msg){}
+	public function onInstallerBeforeInstaller (\InstallerModelInstall $ModelInstall , &$package ){}
 
 	/**
 	 * OnAfterCompress.
