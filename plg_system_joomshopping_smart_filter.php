@@ -80,7 +80,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 	 */
 	public function onAfterDispatch()
 	{
-
+		if( !$this->checkGNZ11() ) return ; #END IF
 	}
 
 	/**
@@ -92,6 +92,9 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 	 */
 	public function onAfterRender()
 	{
+
+//		if( !$this->checkGNZ11() ) return ; #END IF
+
 
 
 		$body = $this->app->getBody();
@@ -105,15 +108,9 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 		$new_A->setAttribute('class','wrapper');
 		$new_A->setAttribute('','wrapper');
 
-
-
-
 		$uri = \Joomla\CMS\Uri\Uri::getInstance();
 		$characteristics_Var = $uri->getVar('characteristics') ;
-		
 
-
-		
 		foreach( $Nodes as $Ni => $node )
 		{
 			$uri = clone $uri ;
@@ -143,10 +140,16 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 				case 'categorys[]' :
 					$uri_Clone = clone $uri ;
 					$categorys = $uri->getVar('categorys') ;
+
+
+					// /testvik/catalog/besprovodnye-ip-videokamery
+					$link = SEFLink('index.php?option=com_jshopping&controller=category&task=view&category_id='.$value , 1) ;
+
 					$categorys[] = $value ;
 					$uri_Clone->setVar('categorys' , $categorys ) ;
 					# Создаем Ссылку
-					$currentUrl = $uri_Clone->toString(array('scheme', 'user', 'pass', 'host', 'port', 'path', 'query', 'fragment'));
+//					$currentUrl = $uri_Clone->toString(array('scheme', 'user', 'pass', 'host', 'port', 'path', 'query', 'fragment'));
+					$currentUrl = $link ;
 					break ;
 				default :
 
@@ -179,6 +182,17 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 		$this->app->setBody( $body ) ;
 	}
 
+	private function checkGNZ11 (){
+		if( class_exists('\GNZ11\Document\Dom') )
+		{
+//			return true ;
+		}#END IF
+		if(  $this->app->isClient( 'site' ) ) return false; #END IF
+		$this->app->enqueueMessage( \Joomla\CMS\Language\Text::_('PLG_SYSTEM_PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_CHECK_GNZ11') );
+		return false ;
+
+	}
+
 	/**
 	 * onAfterCompileHead.
 	 *
@@ -190,6 +204,32 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 	{
 
 	}
+
+	/**
+	 * @param InstallerModelInstall $ModelInstall
+	 * @param $package
+	 *
+	 *
+	 * @since version
+	 */
+	public function onInstallerBeforeInstallation( \InstallerModelInstall $ModelInstall , &$package ){ }
+
+	/**
+	 * @param InstallerModelInstall $ModelInstall
+	 * @param $package
+	 *
+	 *
+	 * @since version
+	 */
+	public function onInstallerAfterInstaller (\InstallerModelInstall $ModelInstall , &$package){}
+	/**
+	 * @param InstallerModelInstall $ModelInstall
+	 * @param $package
+	 *
+	 *
+	 * @since version
+	 */
+	public function onInstallerBeforeInstaller (\InstallerModelInstall $ModelInstall , &$package , $installer , &$result , &$msg){}
 
 	/**
 	 * OnAfterCompress.

@@ -24,7 +24,18 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic">
-
+				<!--<field name="open_link"
+					type="text"
+					default="xxxx"
+					class="open_link "
+					readonly=""
+					required=""
+					label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_OPEN_LINK"
+					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_OPEN_LINK_DESC"
+					showon=""
+					filter="raw" />-->
+					
+					
 			</fieldset>
 		</fields>
 	</config>
