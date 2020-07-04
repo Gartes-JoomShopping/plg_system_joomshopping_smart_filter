@@ -66,17 +66,18 @@
 
 
 
-
+			$titleNew = $title ;
+			$h1New = $h1 ;
 			if( !empty( $manufacturer_name ) )
 			{
-				$titleNew = $title . ' ' .'"'.$manufacturer_name.'"' ;
-				$h1New = $h1 . ' ' .'"'.$manufacturer_name.'"' ;
+				$titleNew 	.= ' ' .'"'.$manufacturer_name.'"' ;
+				$h1New 		.= ' ' .'"'.$manufacturer_name.'"' ;
 			}#END IF
 
 			if(   $characteristics_name   )
 			{
-				$titleNew = $title . ' ' .'"'.$characteristics_name.'"' ;
-				$h1New = $h1 . ' ' .'"'.$characteristics_name.'"' ;
+				$titleNew 	.=' ' .'"'.$characteristics_name.'"' ;
+				$h1New 		.=' ' .'"'.$characteristics_name.'"' ;
 			}#END IF
 
 			if( !empty( $manufacturer_name ) || $characteristics_name  )
@@ -130,8 +131,9 @@
 			$lang	= \JSFactory::getLang();
 			$characteristics = $this->app->input->get('characteristics' , false , 'ARRAY' ) ;
 			$firstEl = array_shift($characteristics);
+			$firstId = array_shift($firstEl);
 
-			if( empty( $firstEl ) )
+			if( empty( $firstId ) )
 			{
 				return false ;
 			}#END IF
@@ -140,7 +142,7 @@
 							`id` as `value`,
 							`".$lang->get('name')."` as `text`
 						FROM `#__jshopping_products_extra_field_values`
-						WHERE `id` = ".$firstEl[0]."
+						WHERE `id` = ".$firstId."
 						ORDER BY `".$lang->get('name')."`";
 			$this->db->setQuery( $query );
 			$res = $this->db->loadAssoc();
