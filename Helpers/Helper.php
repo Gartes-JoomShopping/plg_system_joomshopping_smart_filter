@@ -130,8 +130,25 @@
 		private function getCharacteristicsName(){
 			$lang	= \JSFactory::getLang();
 			$characteristics = $this->app->input->get('characteristics' , false , 'ARRAY' ) ;
+			
+//			echo'<pre>';print_r( $characteristics );echo'</pre>'.__FILE__.' '.__LINE__;
+			
+			
 			$firstEl = array_shift($characteristics);
 			$firstId = array_shift($firstEl);
+
+
+			/*echo'<pre>';print_r( is_numeric( $firstId.'ip' ) );echo'</pre>'.__FILE__.' '.__LINE__;
+			echo'<pre>';print_r( is_int( $firstId ) );echo'</pre>'.__FILE__.' '.__LINE__;
+			echo'<pre>';print_r( $firstId );echo'</pre>'.__FILE__.' '.__LINE__;
+			die(__FILE__ .' '. __LINE__ );*/
+
+			if( !is_numeric( $firstId ) )
+			{
+				return  $firstId ;
+			}#END IF
+
+
 
 			if( empty( $firstId ) )
 			{
