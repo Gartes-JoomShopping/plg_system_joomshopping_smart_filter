@@ -29,4 +29,19 @@
         <targetplatform name="joomla" version=".*"/>
         <php_minimum>5.3.10</php_minimum>
     </update>
+    <update>
+        <name>plgSystemJoomshoppingSmartFilter By Gartes</name>
+        <description><![CDATA[Search plugin Smart Filter update]]></description>
+        <type>plugin</type>
+        <folder>system</folder>
+        <element>plg_system_joomshopping_smart_filter</element>
+        <version>1.5</version>
+        <client>0</client>
+        <infourl title="github.com">https://github.com/Gartes-JoomShopping/plg_system_joomshopping_smart_filter</infourl>
+        <downloads>
+            <downloadurl type="full" format="zip">https://github.com/Gartes-JoomShopping/plg_system_joomshopping_smart_filter/archive/master.zip</downloadurl>
+        </downloads>
+        <targetplatform name="joomla" version=".*"/>
+        <php_minimum>5.3.10</php_minimum>
+    </update>
 </updates>

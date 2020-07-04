@@ -12,6 +12,9 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Plugin\CMSPlugin;
+	use Joomla\CMS\Factory;
+
+
 
 	JLoader::registerNamespace('GNZ11',JPATH_LIBRARIES.'/GNZ11',$reset=false,$prepend=false,$type='psr4');
 
@@ -83,6 +86,8 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 		if( !$this->checkGNZ11() ) return ; #END IF
 	}
 
+
+
 	/**
 	 * onAfterRender.
 	 *
@@ -97,7 +102,27 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 		$format = $this->app->input->get('format' , false );
 		if( !$Itemid || $format ) return; #END IF
 
-//		if( !$this->checkGNZ11() ) return ; #END IF
+		$categorys = $this->app->input->get('categorys' , false ) ;
+		$manufacturers = $this->app->input->get('manufacturers' , false , 'ARRAY' ) ;
+		$characteristics = $this->app->input->get('characteristics' , false , 'ARRAY' ) ;
+
+
+
+
+		# если влключен фиьтр по брендам
+		if( !empty( $manufacturers ) || !empty( $characteristics )  )
+		{
+			JLoader::registerNamespace('SmartFilter',JPATH_PLUGINS.'/system/plg_system_joomshopping_smart_filter',$reset=false,$prepend=false,$type='psr4');
+			$Helper = \SmartFilter\Helpers\Helper::instance() ;
+			$Helper->TitleEdit();
+		}#END IF
+
+
+
+		if(  !empty( $manufacturers ) || !empty( $categorys ) || !empty( $characteristics ) ) return; #END IF
+
+
+
 
 
 
@@ -131,6 +156,11 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 			{
 				$name = null ;
 			}#END IF
+
+
+
+
+
 			switch($name){
 				case 'manufacturers[]' :
 					$uri_Clone = clone $uri ;
@@ -142,6 +172,9 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 
 					break ;
 				case 'categorys[]' :
+//					continue ;
+//					return ;
+
 					$uri_Clone = clone $uri ;
 					$categorys = $uri->getVar('categorys') ;
 
@@ -175,6 +208,13 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 					# Создаем Ссылку
 					$currentUrl = $uri_Clone->toString(array('scheme', 'user', 'pass', 'host', 'port', 'path', 'query', 'fragment'));
 			}
+
+			if( $name == 'categorys[]' )
+			{
+				continue ;
+			}#END IF
+
+
 			# Клонируем елемент
 			$new_A_clone = $new_A->cloneNode();
 			$new_A_clone->setAttribute('href' , $currentUrl ) ;

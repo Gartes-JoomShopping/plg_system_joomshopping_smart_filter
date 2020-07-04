@@ -7,7 +7,7 @@
 	<authorUrl> * </authorUrl>
 	<copyright>A copyright</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>1.4</version>
+	<version>1.5</version>
 	<description>PLG_SYSTEM_PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_XML_DESCRIPTION</description>
 
 	<!-- Scripts to run on installation -->
@@ -15,6 +15,7 @@
 
 	<!-- Plugin files -->
 	<files>
+		<folder>Helpers</folder>
 		<folder>language</folder>
 		<filename plugin="plg_system_joomshopping_smart_filter">plg_system_joomshopping_smart_filter.php</filename>
 		<filename>README.md</filename>
