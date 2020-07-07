@@ -16,6 +16,7 @@ use Joomla\CMS\Plugin\CMSPlugin;
 
 
 
+
 	JLoader::registerNamespace('GNZ11',JPATH_LIBRARIES.'/GNZ11',$reset=false,$prepend=false,$type='psr4');
 
 /**
