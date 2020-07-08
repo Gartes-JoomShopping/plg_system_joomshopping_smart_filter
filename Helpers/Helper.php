@@ -26,14 +26,59 @@
 		 */
 		private $db;
 		public static $instance;
+        /**
+         * @var array
+         * @since version
+         */
+        private $params;
+        /**
+         * @var mixed
+         * @since version
+         */
+        private $RootCategory;
+        private $ParentCategory;
+        private $CurrentCategory;
+        /**
+         * @var string|string[]
+         * @since version
+         */
+        private $h1;
+        /**
+         * @var mixed
+         * @since version
+         */
+        private $City;
+        /**
+         * @var string|string[]
+         * @since version
+         */
+        private $Title;
 
-		/**
+        private $pregArr = [
+            '{RootCategory}',
+            '{ParentCategory}',
+            '{CurrentCategory}',
+            '{H1}',
+            '{City}',
+            '{FilterStringParam}',
+        ];
+        
+        /**
+         * @var string
+         * @since version
+         */
+        private $FilterStringParam = '';
+
+
+
+        /**
 		 * helper constructor.
 		 * @throws Exception
 		 * @since 3.9
 		 */
 		private function __construct( $options = array() )
 		{
+		    $this->params = $options ;
 			$this->app = Factory::getApplication();
 			$this->db = Factory::getDbo();
 			return $this;
@@ -55,46 +100,168 @@
 			return self::$instance;
 		}#END FN
 
-		public function TitleEdit(){
+		public function TitleEdit( $filterData ){
 
-			$title =  $this->getContentNode( 'title' );
-			$h1 =  $this->getContentNode( 'h1' );
-			$manufacturer_name = $this->getManufactureName();
-			$characteristics_name = $this->getCharacteristicsName();
+            \JLoader::registerNamespace('CountryFilter',JPATH_PLUGINS.'/system/country_filter',$reset=false,$prepend=false,$type='psr4');
+            $city = $this->app->input->get('sitecountry' , 'moskva' );
 
-
-
-
-
-			$titleNew = $title ;
-			$h1New = $h1 ;
-			if( !empty( $manufacturer_name ) )
-			{
-				$titleNew 	.= ' ' .'"'.$manufacturer_name.'"' ;
-				$h1New 		.= ' ' .'"'.$manufacturer_name.'"' ;
-			}#END IF
-
-			if(   $characteristics_name   )
-			{
-				$titleNew 	.=' ' .'"'.$characteristics_name.'"' ;
-				$h1New 		.=' ' .'"'.$characteristics_name.'"' ;
-			}#END IF
-
-			if( !empty( $manufacturer_name ) || $characteristics_name  )
-			{
-				$this->setContentNode( 'title' , $titleNew );
-				$this->setContentNode( 'h1' , $h1New );
-			}#END IF
+            # Получить даные для выбранного города
+            $this->City =  ( \CountryFilter\Helpers\CitiesDirectory::getLocationByCityName( $city ) )['cities'] ;
 
 
 
 
 
-//			echo'<pre>';print_r( $title );echo'</pre>'.__FILE__.' '.__LINE__;
-//			echo'<pre>';print_r( $h1 );echo'</pre>'.__FILE__.' '.__LINE__;
-//			echo'<pre>';print_r( $manufacturer_name );echo'</pre>'.__FILE__.' '.__LINE__;
-//			die(__FILE__ .' '. __LINE__ );
-		}
+
+
+
+
+
+			$firstFilterGroup = $this::_array_key_first( $filterData );
+
+
+            if (count($filterData) == 1) {
+                switch ($firstFilterGroup) {
+                    case 'manufacturers' :
+                        if (count($filterData['manufacturers']) > 1) break; #END IF
+                        $First = array_shift($filterData['manufacturers']);
+                        $manufacturer_name = $this->getManufactureName($First);
+                        $manufactere_label = $this->params->get('manufactere_label', 'Производитель');
+                        $this->FilterStringParam = $manufactere_label . ' "' . $manufacturer_name . '"';
+
+                        break;
+
+                    case 'characteristics' :
+
+                        if (count($filterData['characteristics']) > 1) break; #END IF
+                        $characteristicsGroupID = $this::_array_key_first($filterData['characteristics']);
+                        if (count($filterData['characteristics'][$characteristicsGroupID]) > 1) return; #END IF
+
+                        $fields = \JSFactory::getAllProductExtraField();
+                        $characteristicsName = $fields[$characteristicsGroupID]->name;
+                        $value = array_shift($filterData['characteristics'][$characteristicsGroupID]);
+
+
+                        # Если в строке нет букв
+                        $chr_ru_en = "A-zА-Яа-яЁё";
+                        if (!preg_match("/[$chr_ru_en]/u", $value)) {
+                            $Query = $this->db->getQuery(true);
+                            $whereArr = [
+                                $this->db->quoteName('id') . ' = ' . $this->db->quote($value),
+                                $this->db->quoteName('field_id') . ' = ' . $this->db->quote($characteristicsGroupID),
+                            ];
+                            $Query->select('*')
+                                ->from($this->db->quoteName('#__jshopping_products_extra_field_values'))
+                                ->where($whereArr);
+                            $this->db->setQuery($Query);
+
+                            $res = $this->db->loadAssoc();
+                            if (isset($res['name_ru-RU'])) {
+                                $value = $res['name_ru-RU'];
+                            }#END IF
+                        }
+                        $this->FilterStringParam = $characteristicsName . ' "' . $value . '"';
+                        break;
+
+                    default :
+                }
+            }#END IF
+
+            /* echo'<pre>';print_r( $this->RootCategory );echo'</pre>'.__FILE__.' '.__LINE__;
+             die(__FILE__ .' '. __LINE__ );*/
+
+            $h1 = $this->getContentNode('h1');
+            if (empty($h1)) {  }#END IF
+
+            # Создание создание h1
+            $template_h1 = $this->params->get('template_h1', $h1);
+            $data_H1 = [
+                $this->RootCategory,
+                $this->ParentCategory,
+                $this->CurrentCategory,
+                '',
+                $this->City,
+                $this->FilterStringParam,
+            ];
+            $this->h1 = str_replace($this->pregArr, $data_H1, $template_h1);
+            $this->h1 = $this->_cleanTags($this->h1);
+            $this->setContentNode('h1', $this->h1);
+
+            $data = [
+                $this->RootCategory,
+                $this->ParentCategory,
+                $this->CurrentCategory,
+                $this->h1,
+                $this->City,
+            ];
+
+            # Создание тайтла
+            $title = $this->getContentNode('title');
+            if (empty($title)) {
+
+                $template_Title = $this->params->get('template_title', $title);
+                $this->Title = str_replace($this->pregArr, $data, $template_Title);
+                $this->Title = $this->_cleanTags($this->Title);
+                $this->setContentNode('title', $this->Title);
+            }
+
+            $description = $this->getContentNode('description');
+            if (empty($description)) {
+                $template_Description = $this->params->get('template_description', $description);
+                $this->Description = str_replace($this->pregArr, $data, $template_Description);
+                $this->Description = $this->_cleanTags($this->Description);
+                $this->setContentNode('description', $this->Description);
+            }
+
+
+
+
+
+
+        }
+
+
+        public function _checkCategory(  ){
+
+            $CategoryTable = \JTable::getInstance('Category', 'jshop') ;
+            $parentCategoryTable = clone $CategoryTable ;
+            $category_id = $this->app->input->get('category_id' , false ) ;
+            $CategoryTable->load( $category_id );
+
+            $parentCategoryTable->load( $CategoryTable->category_parent_id ) ;
+            // Родительская категория
+            $this->ParentCategory = $parentCategoryTable->{'name_ru-RU'} ;
+
+            $Pathway = $this->app->getPathway();
+            $PathwayNamesArr = $Pathway->getPathwayNames() ;
+
+
+            if ( isset( $PathwayNamesArr[1] ) ) {
+                // Главная категория
+                $this->RootCategory = $PathwayNamesArr[1] ;
+            }#END IF
+
+            if ( $CategoryTable->{'name_ru-RU'} != $this->RootCategory ) {
+                // текушая категория
+                $this->CurrentCategory = $CategoryTable->{'name_ru-RU'} ;
+            }#END IF
+        }
+
+        /**
+         * Кдалить мусор из тега ( h1 , title )
+         * @param $tag
+         *
+         * @return string
+         *
+         * @since version
+         */
+        private function _cleanTags( $tag ){
+            $searchArr = [
+                '()' ,
+                '[]' ,
+            ];
+            return trim( str_replace(  $searchArr ,'', $tag ) ) ;
+        }
 
 		/**
 		 * Установить новое значение для тега
@@ -108,7 +275,17 @@
 			$body = $this->app->getBody();
 			$dom = new \GNZ11\Document\Dom();
 			$dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
-			$dom->getElementsByTagName( $nodeName )->item(0)->nodeValue = $content;
+            if ( $nodeName == 'description') {
+                $metas = $dom->getElementsByTagName('meta');
+                foreach ($metas as $meta) {
+                    if (strtolower($meta->getAttribute('name')) == 'description') {
+                        $meta->setAttribute("content", $content);
+                    }
+                }
+            }else{
+                $dom->getElementsByTagName( $nodeName )->item(0)->nodeValue = $content;
+            }#END IF
+
 			$body =  $dom->saveHTML() ;
 			$this->app->setBody( $body ) ;
 		}
@@ -124,18 +301,44 @@
 			$body = $this->app->getBody();
 			$dom = new \GNZ11\Document\Dom();
 			$dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
-			return $dom->getElementsByTagName( $nodeName )->item(0)->nodeValue ;
+
+            if ($nodeName == 'description' ) {
+                $metas = $dom->getElementsByTagName('meta');
+                foreach ($metas as $meta) {
+                    if (strtolower($meta->getAttribute('name')) == 'description') {
+                        return $meta->getAttribute('content');
+                    }
+                }
+            }#END IF
+            return $dom->getElementsByTagName( $nodeName )->item(0)->nodeValue ;
 		}
 
 		private function getCharacteristicsName(){
 			$lang	= \JSFactory::getLang();
 			$characteristics = $this->app->input->get('characteristics' , false , 'ARRAY' ) ;
+
+
+
+
+            if ( !$characteristics )  return null  ; #END IF
+
+
 			
-//			echo'<pre>';print_r( $characteristics );echo'</pre>'.__FILE__.' '.__LINE__;
-			
-			
+			# id групп полей
+			$groupId = self::_array_key_first( $characteristics );
+
+//            echo'<pre>';print_r( $groupId );echo'</pre>'.__FILE__.' '.__LINE__;
+//            echo'<pre>';print_r( $characteristics );echo'</pre>'.__FILE__.' '.__LINE__;
+
+
+
 			$firstEl = array_shift($characteristics);
 			$firstId = array_shift($firstEl);
+
+
+
+//            die(__FILE__ .' '. __LINE__ );
+
 
 
 			/*echo'<pre>';print_r( is_numeric( $firstId.'ip' ) );echo'</pre>'.__FILE__.' '.__LINE__;
@@ -172,13 +375,25 @@
 		 *
 		 * @since version
 		 */
-		private function getManufactureName(){
-			$manufacturersID = ($this->app->input->get('manufacturers' , false , 'ARRAY' ))[0] ;
-			$manufacturer = \JTable::getInstance('manufacturer', 'jshop');
+		private function getManufactureName( $manufacturersID ){
+            $manufacturer = \JTable::getInstance('manufacturer', 'jshop');
 			$manufacturer->load( $manufacturersID );
-			$manufacturer_name = $manufacturer->getName();
-			return $manufacturer_name ;
+            return $manufacturer->getName();
 		}
 
+        /**
+         * Полифилл array_key_first (PHP 7 >= 7.3.0)
+         * Получить первый ключ заданного массива array, не затрагивая внутренний указатель массива.
+         *
+         * @param $array array
+         * @since 3.9
+         * @Todo IS TEMPLATE
+         */
+		private static function _array_key_first( array $array ){
+            foreach($array as $key => $unused) {
+                return $key;
+            }
+            return null ;
+        }
 
 	}

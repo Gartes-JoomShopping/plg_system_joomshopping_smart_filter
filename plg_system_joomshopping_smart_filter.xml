@@ -25,16 +25,60 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic">
-				<!--<field name="open_link"
+				<field name="manufactere_label"
 					type="text"
-					default="xxxx"
-					class="open_link "
+					default="Производитель"
+					class="manufactere_label "
 					readonly=""
 					required=""
-					label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_OPEN_LINK"
-					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_OPEN_LINK_DESC"
+					label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_MANUFACTERE_LABEL"
+					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_MANUFACTERE_LABEL_DESC"
 					showon=""
-					filter="raw" />-->
+					filter="raw" />
+
+				<field name="template_h1"
+					type="textarea"
+					default=""
+					class="template_h1 "
+					rows="5"
+					cols="36"
+					readonly=""
+					required=""
+					label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_TEMPLATE_H1"
+					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_TEMPLATE_H1_DESC"
+					showon=""
+					hint=""
+					filter="raw" />
+
+				<field name="template_title"
+					   type="textarea"
+					   default=""
+					   class="template_title "
+					   rows="5"
+					   cols="36"
+					   readonly=""
+					   required=""
+					   label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_TEMPLATE_TITLE"
+					   description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_TEMPLATE_TITLE_DESC"
+					   showon=""
+					   hint=""
+					   filter="raw" />
+
+				<field name="template_description"
+					   type="textarea"
+					   default=""
+					   class="template_description "
+					   rows="5"
+					   cols="36"
+					   readonly=""
+					   required=""
+					   label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_TEMPLATE_DESCRIPTION"
+					   description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_TEMPLATE_DESCRIPTION_DESC"
+					   showon=""
+					   hint=""
+					   filter="raw" />
+
+
 					
 					
 			</fieldset>
