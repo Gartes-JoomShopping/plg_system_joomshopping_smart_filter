@@ -78,10 +78,10 @@
 		 */
 		private function __construct( $options = array() )
 		{
-		    $this->params = $options ;
+            $this->params = $options ;
 			$this->app = Factory::getApplication();
 			$this->db = Factory::getDbo();
-			return $this;
+            return $this;
 		}#END FN
 
 		/**
@@ -102,27 +102,21 @@
 
 		public function TitleEdit( $filterData ){
 
+		    $lang	= \JSFactory::getLang();
+
             \JLoader::registerNamespace('CountryFilter',JPATH_PLUGINS.'/system/country_filter',$reset=false,$prepend=false,$type='psr4');
             $city = $this->app->input->get('sitecountry' , 'moskva' );
 
             # Получить даные для выбранного города
             $this->City =  ( \CountryFilter\Helpers\CitiesDirectory::getLocationByCityName( $city ) )['cities'] ;
 
+            $CategoryTable = $this->getCatrgory();
 
-
-
-
-
-
-
-
-
-			$firstFilterGroup = $this::_array_key_first( $filterData );
-
-
+            $firstFilterGroup = $this::_array_key_first( $filterData );
             if (count($filterData) == 1) {
                 switch ($firstFilterGroup) {
                     case 'manufacturers' :
+
                         if (count($filterData['manufacturers']) > 1) break; #END IF
                         $First = array_shift($filterData['manufacturers']);
                         $manufacturer_name = $this->getManufactureName($First);
@@ -130,7 +124,6 @@
                         $this->FilterStringParam = $manufactere_label . ' "' . $manufacturer_name . '"';
 
                         break;
-
                     case 'characteristics' :
 
                         if (count($filterData['characteristics']) > 1) break; #END IF
@@ -167,14 +160,21 @@
                 }
             }#END IF
 
-            /* echo'<pre>';print_r( $this->RootCategory );echo'</pre>'.__FILE__.' '.__LINE__;
-             die(__FILE__ .' '. __LINE__ );*/
 
+
+
+            #Если тэг h1 пустой загружаем шаблон из настроек плагина
+            # Иначе принимаем тэг h1 как шаблон
             $h1 = $this->getContentNode('h1');
-            if (empty($h1)) {  }#END IF
+            if (empty($h1)) {
+//                $template_h1 = $this->params->get('template_h1', $h1);
+            }else{
+                $title = $CategoryTable->{$lang->get('name')};
+                $template_h1 = $title ;
+            }#END IF
 
             # Создание создание h1
-            $template_h1 = $this->params->get('template_h1', $h1);
+
             $data_H1 = [
                 $this->RootCategory,
                 $this->ParentCategory,
@@ -183,10 +183,20 @@
                 $this->City,
                 $this->FilterStringParam,
             ];
-            $this->h1 = str_replace($this->pregArr, $data_H1, $template_h1);
-            $this->h1 = $this->_cleanTags($this->h1);
-            $this->setContentNode('h1', $this->h1);
 
+            $this->h1 = $this->loadDataTemplate( $template_h1 ) ;
+
+//            echo'<pre>';print_r( $this->h1 );echo'</pre>'.__FILE__.' '.__LINE__;
+//            die(__FILE__ .' '. __LINE__ );
+
+
+//            $this->h1 = str_replace($this->pregArr, $data_H1, $template_h1);
+//            $this->h1 = $this->_cleanTags($this->h1);
+            $this->setContentNode('h1', $this->h1);
+            
+
+
+            
             $data = [
                 $this->RootCategory,
                 $this->ParentCategory,
@@ -196,38 +206,109 @@
             ];
 
             # Создание тайтла
-            $title = $this->getContentNode('title');
+//            $title = $this->getContentNode('title');
+            $title = $CategoryTable->{$lang->get('meta_title')};
             if (empty($title)) {
 
                 $template_Title = $this->params->get('template_title', $title);
-                $this->Title = str_replace($this->pregArr, $data, $template_Title);
-                $this->Title = $this->_cleanTags($this->Title);
+                $this->Title = $this->loadDataTemplate( $template_Title ) ;
+//                $this->Title = str_replace($this->pregArr, $data, $template_Title);
+//                $this->Title = $this->_cleanTags($this->Title);
                 $this->setContentNode('title', $this->Title);
+            }else{
+                $this->Title = $this->loadDataTemplate( $title ) ;
+                $this->setContentNode('title', $this->Title );
             }
 
-            $description = $this->getContentNode('description');
+//            $description = $this->getContentNode('description');
+            $description = $CategoryTable->{$lang->get('meta_description')};
             if (empty($description)) {
                 $template_Description = $this->params->get('template_description', $description);
-                $this->Description = str_replace($this->pregArr, $data, $template_Description);
-                $this->Description = $this->_cleanTags($this->Description);
+                $this->Description = $this->loadDataTemplate( $template_Description ) ;
+
+//                $this->Description = str_replace($this->pregArr, $data, $template_Description);
+//                $this->Description = $this->_cleanTags($this->Description);
+                $this->setContentNode('description', $this->Description);
+            }else{
+                $this->Description = $this->loadDataTemplate( $description ) ;
                 $this->setContentNode('description', $this->Description);
             }
 
 
+            $this->correctBreadcrumbs();
+
+
+        }
+        protected function loadDataTemplate( $template ){
+
+            $template = str_replace('[[[CITY]]]' , '{City}' , $template ) ;
+            $data = [
+                $this->RootCategory,
+                $this->ParentCategory,
+                $this->CurrentCategory,
+                $this->h1,
+                $this->City,
+                $this->FilterStringParam ,
+            ];
+            $res = trim( str_replace($this->pregArr, $data, $template )  ) ;
+
+            return $this->_cleanTags( $res )  ;
+//            echo'<pre>';print_r( $this->pregArr );echo'</pre>'.__FILE__.' '.__LINE__;
+//            echo'<pre>';print_r( $res );echo'</pre>'.__FILE__.' '.__LINE__;
+//            echo'<pre>';print_r( $data );echo'</pre>'.__FILE__.' '.__LINE__;
+//            echo'<pre>';print_r( $template );echo'</pre>'.__FILE__.' '.__LINE__;
+
+
+        }
+        /**
+         * Редактирования Breadcrumbs
+         *
+         * @since version
+         */
+        protected function correctBreadcrumbs(){
+//            $classname
+
+            $body = $this->app->getBody();
+            $dom = new \GNZ11\Document\Dom();
+            $dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
+            $xpath = new \DOMXPath($dom);
+            $Nodes = $xpath->query("//*[contains(@class, 'breadcrumbs')] //li//span[contains(@itemprop, 'name')]");
+            foreach ( $Nodes as $node) {
+                $node->nodeValue = $this->loadDataTemplate( $node->nodeValue ) ;
+//                echo'<pre>';print_r( $node->nodeValue  );echo'</pre>'.__FILE__.' '.__LINE__;
+            }#END FOREACH
+
+            $body =  $dom->saveHTML() ;
+            $this->app->setBody( $body ) ;
+            
+//            die(__FILE__ .' '. __LINE__ );
 
 
 
 
+           /* $dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
+            $dom->getElementsByTagName( $nodeName ) ;*/
+        }
+
+        /**
+         * Получить текущию категорию
+         *
+         * @since version
+         */
+        protected function getCatrgory (){
+            $CategoryTable = \JTable::getInstance('Category', 'jshop') ;
+            $parentCategoryTable = clone $CategoryTable ;
+            $category_id = $this->app->input->get('category_id' , false ) ;
+            $CategoryTable->load( $category_id );
+            return $CategoryTable ;
         }
 
 
         public function _checkCategory(  ){
 
-            $CategoryTable = \JTable::getInstance('Category', 'jshop') ;
-            $parentCategoryTable = clone $CategoryTable ;
-            $category_id = $this->app->input->get('category_id' , false ) ;
-            $CategoryTable->load( $category_id );
+            $CategoryTable = $this->getCatrgory();
 
+            $parentCategoryTable = clone $CategoryTable ;
             $parentCategoryTable->load( $CategoryTable->category_parent_id ) ;
             // Родительская категория
             $this->ParentCategory = $parentCategoryTable->{'name_ru-RU'} ;

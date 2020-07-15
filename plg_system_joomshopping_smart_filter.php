@@ -124,11 +124,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 
         $Helper->_checkCategory() ;
 
-
-
-
-
-        # Если параметры фильтра пустые - ставим ссылки на все сссылки 
+        # Если параметры фильтра пустые - ставим ссылки на все сссылки
         if (empty ($filterData ) ) {
             $this->_addLikToFilter();
 
