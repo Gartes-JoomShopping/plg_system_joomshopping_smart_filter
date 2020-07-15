@@ -35,6 +35,23 @@
 					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_MANUFACTERE_LABEL_DESC"
 					showon=""
 					filter="raw" />
+				<field name="processing_rules_h1"
+					type="list"
+					default="0"
+					required=""
+					label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1"
+					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_DESC"
+					class="processing_rules_h1 "
+					multiple="false"
+					readonly=""
+					showon=""
+					filter="raw" >
+						<option value="">Please Select</option>
+						<option value="0">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG</option>
+						<option value="1">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_TITLE</option>
+						<option value="2">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG_IF_THERE_IS_NO_TEMPLATE_IN_TITLE</option>
+					</field>
+
 
 				<field name="template_h1"
 					type="textarea"
@@ -50,6 +67,22 @@
 					hint=""
 					filter="raw" />
 
+				<field name="processing_rules_title"
+					   type="list"
+					   default="0"
+					   required=""
+					   label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_TITLE"
+					   description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_TITLE_DESC"
+					   class="processing_rules_title "
+					   multiple="false"
+					   readonly=""
+					   showon=""
+					   filter="raw" >
+					<option value="">Please Select</option>
+					<option value="0">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG</option>
+					<option value="1">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_TITLE</option>
+					<option value="2">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG_IF_THERE_IS_NO_TEMPLATE_IN_TITLE</option>
+				</field>
 				<field name="template_title"
 					   type="textarea"
 					   default=""
@@ -63,7 +96,25 @@
 					   showon=""
 					   hint=""
 					   filter="raw" />
-
+				
+				<field name="processing_rules_description"
+					type="list"
+					default="0"
+					required=""
+					label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_DESCRIPTION"
+					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_DESCRIPTION_DESC"
+					class="processing_rules_description "
+					multiple="false"
+					readonly=""
+					showon=""
+					filter="raw" >
+					<option value="">Please Select</option>
+					<option value="0">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG</option>
+					<option value="1">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_IN_DESCRIPTION_DESC</option>
+					<option value="2">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG_IF_THERE_IS_NO_TEMPLATE_IN_DESCRIPTION_DESC</option>
+					<option value="3">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG_IF_THERE_IS_NO_TEMPLATE</option>
+					</field>
+					
 				<field name="template_description"
 					   type="textarea"
 					   default=""
@@ -77,8 +128,18 @@
 					   showon=""
 					   hint=""
 					   filter="raw" />
-
-
+				<field name="process_breadcrumbs"
+					type="radio"
+					default="0"
+					label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESS_BREADCRUMBS"
+					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESS_BREADCRUMBS_DESC"
+					class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				
+				 
+				
 
 
 					

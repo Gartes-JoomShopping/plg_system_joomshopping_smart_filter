@@ -104,10 +104,19 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 
 		$Itemid = $this->app->input->get('Itemid' , false );
 		$format = $this->app->input->get('format' , false );
-		$controller = $this->app->input->get('controller' , false );
+        $controller = $this->app->input->get('controller' , false );
 
-		if( !$Itemid || $format || $controller != 'category'  ) return; #END IF
 
+
+
+		if( !$Itemid || $format || ( $controller != 'category' && $controller != 'product' )  ) return; #END IF
+
+
+        if ($controller == 'product') {
+            $Helper->cleanCode();
+
+            return;
+        }#END IF
 
         $arr = [
             'manufacturers'=>'',
@@ -117,15 +126,23 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
         # Получить параметры фильтра из $_GET
         $inputArr = $this->app->input->getArray( $arr );
 
+
+
+
+
         # Удаляем пустые параметры
         $filterData = array_filter( $inputArr, function($element) {
             return !empty($element);
         });
 
+
+
         $Helper->_checkCategory() ;
 
+
+
         # Если параметры фильтра пустые - ставим ссылки на все сссылки
-        if (empty ($filterData ) ) {
+        if (empty ($filterData ) && $controller == 'category' ) {
             $this->_addLikToFilter();
 
         }else{
@@ -135,7 +152,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 
 
 
-        $Helper->TitleEdit( $filterData );
+          $Helper->TitleEdit( $filterData );
     }
 
     public function getRootParentCategory (){

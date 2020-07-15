@@ -42,7 +42,7 @@
          * @var string|string[]
          * @since version
          */
-        private $h1;
+        private $h1 = '';
         /**
          * @var mixed
          * @since version
@@ -54,7 +54,7 @@
          */
         private $Title;
 
-        private $pregArr = [
+        public $pregArr = [
             '{RootCategory}',
             '{ParentCategory}',
             '{CurrentCategory}',
@@ -68,7 +68,18 @@
          * @since version
          */
         private $FilterStringParam = '';
-
+        /**
+         * Массив для хранения мета данных категори Тэг h1
+         * @var array
+         * @since version
+         */
+        public $dataForCategoryH1;
+        /**
+         * META description
+         * @var string
+         * @since version
+         */
+        public $Description;
 
 
         /**
@@ -160,55 +171,94 @@
                 }
             }#END IF
 
+            /*echo'<pre>';print_r( '-'.$this->FilterStringParam.'-' );echo'</pre>'.__FILE__.' '.__LINE__;
+            die(__FILE__ .' '. __LINE__ );*/
 
 
+            $this->dataForCategoryH1 = [
+                $this->RootCategory,
+                $this->ParentCategory,
+                $this->CurrentCategory,
+                $this->h1,
+                $this->City,
+                $this->FilterStringParam ,
+            ];
 
+            /**
+             * Обработка тэга h1
+             */
+            $processing_rules_h1 = $this->params->get('processing_rules_h1', 0 );
+            switch ($processing_rules_h1){
+                case 1 :
+                    break ;
+                case 2 :
+                    die(__FILE__ .' '. __LINE__ );
+
+                    break;
+                default:
+                    $arrSearch = $this->getArrSearchForClean() ;
+                    $key = array_search('{H1}', $this->pregArr);
+
+                    foreach ($this->dataForCategoryH1 as $i => $item) {
+                        $this->dataForCategoryH1[$i] = str_replace( $arrSearch , '' , $item ) ;
+                    }#END FOREACH
+
+                    $template_h1 = $this->params->get('template_h1', false );
+                    $this->h1 = $this->loadDataTemplate( $template_h1 ,  $this->dataForCategoryH1 ) ;
+                    $this->setContentNode('h1', $this->h1 );
+                    $this->dataForCategoryH1[ $key ] =  $this->h1  ;
+            }
             #Если тэг h1 пустой загружаем шаблон из настроек плагина
             # Иначе принимаем тэг h1 как шаблон
-            $h1 = $this->getContentNode('h1');
-            if (empty($h1)) {
-//                $template_h1 = $this->params->get('template_h1', $h1);
-            }else{
-                $title = $CategoryTable->{$lang->get('name')};
-                $template_h1 = $title ;
-            }#END IF
+//            $h1 = $this->getContentNode('h1');
+
+//            echo'<pre>';print_r( $processing_rules_h1 );echo'</pre>'.__FILE__.' '.__LINE__;
+
+//            die(__FILE__ .' '. __LINE__ );
+
+//            if (empty($h1)) {
+////
+//            }else{
+//                $title = $CategoryTable->{$lang->get('name')};
+//                $template_h1 = $title ;
+//            }#END IF
 
             # Создание создание h1
 
-            $data_H1 = [
+            /*$data_H1 = [
                 $this->RootCategory,
                 $this->ParentCategory,
                 $this->CurrentCategory,
                 '',
                 $this->City,
                 $this->FilterStringParam,
-            ];
-
-            $this->h1 = $this->loadDataTemplate( $template_h1 ) ;
-
-//            echo'<pre>';print_r( $this->h1 );echo'</pre>'.__FILE__.' '.__LINE__;
-//            die(__FILE__ .' '. __LINE__ );
-
-
-//            $this->h1 = str_replace($this->pregArr, $data_H1, $template_h1);
-//            $this->h1 = $this->_cleanTags($this->h1);
-            $this->setContentNode('h1', $this->h1);
-            
+            ];*/
 
 
             
-            $data = [
-                $this->RootCategory,
-                $this->ParentCategory,
-                $this->CurrentCategory,
-                $this->h1,
-                $this->City,
-            ];
+            $processing_rules_title = $this->params->get('processing_rules_title', 0 );
+            switch ($processing_rules_title){
+                case 1 :
+                    break ;
+                case 2 :
+                    break ;
+                default :
+                    $template_Title = $this->params->get('template_title', false );
+                    $this->Title = $this->loadDataTemplate( $template_Title ,  $this->dataForCategoryH1 ) ;
+                    $this->setContentNode('title', $this->Title );
+            }
+
+
+
+
 
             # Создание тайтла
 //            $title = $this->getContentNode('title');
             $title = $CategoryTable->{$lang->get('meta_title')};
-            if (empty($title)) {
+
+
+
+            /*if (empty($title)) {
 
                 $template_Title = $this->params->get('template_title', $title);
                 $this->Title = $this->loadDataTemplate( $template_Title ) ;
@@ -218,10 +268,39 @@
             }else{
                 $this->Title = $this->loadDataTemplate( $title ) ;
                 $this->setContentNode('title', $this->Title );
+            }*/
+
+            $processing_rules_description = $this->params->get('processing_rules_description', 0 );
+            switch ($processing_rules_description){
+                case 1 :
+                    $template_description = $CategoryTable->{$lang->get('meta_description')} ;
+                    $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
+                    $this->setContentNode('description', $this->Description );
+                    break ;
+                case 2 :
+                    $template_description = $CategoryTable->{$lang->get('meta_description')} ;
+                    if (empty( $template_description ) ) {
+                        $template_description = $this->params->get('template_description', false );
+                    }#END IF
+                    $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
+                    $this->setContentNode('description', $this->Description );
+                    break ;
+                case 3 :
+                    $template_description = $CategoryTable->{$lang->get('meta_description')} ;
+                    $pos = \GNZ11\Document\Text::strpos_array($template_description , $this->pregArr) ;
+                    echo'<pre>';print_r( $pos );echo'</pre>'.__FILE__.' '.__LINE__;
+                    die(__FILE__ .' '. __LINE__ );
+
+
+                    break ;
+                default :
+                    $template_description = $this->params->get('template_description', false );
+                    $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
+                    $this->setContentNode('description', $this->Description );
             }
 
 //            $description = $this->getContentNode('description');
-            $description = $CategoryTable->{$lang->get('meta_description')};
+            /*$description = $CategoryTable->{$lang->get('meta_description')};
             if (empty($description)) {
                 $template_Description = $this->params->get('template_description', $description);
                 $this->Description = $this->loadDataTemplate( $template_Description ) ;
@@ -234,38 +313,82 @@
                 $this->setContentNode('description', $this->Description);
             }
 
+            */
 
-            $this->correctBreadcrumbs();
+            if ( $this->params->get('process_breadcrumbs', 0 ) ) {
+                $this->correctBreadcrumbs();
+            }#END IF
 
-
+            $this->cleanCode();
         }
-        protected function loadDataTemplate( $template ){
+
+        /**
+         * Удалить неиспользованные шаблоны
+         *
+         * @since version
+         */
+        public function cleanCode(){
+		    $arrSearch = $this->getArrSearchForClean() ;
+            # После выполнения всех операций удаляем все шаблоны в ненужных местах
+            $body = $this->app->getBody();
+
+            $body = str_replace( $arrSearch , '' , $body ) ;
+//            $body = $this->_cleanTags( $body );
+            $this->app->setBody( $body ) ;
+        }
+
+        /**
+         * Создать массив для очищения шаблонов
+         * @return array
+         *
+         * @since version
+         */
+        protected function getArrSearchForClean(){
+            $arrSearch = [];
+            foreach ( $this->pregArr as $item) {
+                $arrSearch[] = '('.$item.')' ;
+                $arrSearch[] = '['.$item.']' ;
+                $arrSearch[] = $item ;
+            }#END FOREACH
+            return $arrSearch ;
+        }
+
+        /**
+         * Замена шаблонов в строке
+         * @param $template
+         *
+         * @param bool $data
+         * @return string
+         *
+         * @since version
+         */
+        protected function loadDataTemplate( $template , $data = false ){
 
             $template = str_replace('[[[CITY]]]' , '{City}' , $template ) ;
-            $data = [
-                $this->RootCategory,
-                $this->ParentCategory,
-                $this->CurrentCategory,
-                $this->h1,
-                $this->City,
-                $this->FilterStringParam ,
-            ];
-            $res = trim( str_replace($this->pregArr, $data, $template )  ) ;
+            if (!$data) {
+                $data = [
+                    $this->RootCategory,
+                    $this->ParentCategory,
+                    $this->CurrentCategory,
+                    $this->h1,
+                    $this->City,
+                    $this->FilterStringParam ,
+                ];
+            }#END IF
+            $res = trim( str_replace( $this->pregArr , $data, $template )  ) ;
+            # удалить повторяющиеся пробелы в тексте
+            $res =  preg_replace('/ {2,}/',' ',$res);
+
 
             return $this->_cleanTags( $res )  ;
-//            echo'<pre>';print_r( $this->pregArr );echo'</pre>'.__FILE__.' '.__LINE__;
-//            echo'<pre>';print_r( $res );echo'</pre>'.__FILE__.' '.__LINE__;
-//            echo'<pre>';print_r( $data );echo'</pre>'.__FILE__.' '.__LINE__;
-//            echo'<pre>';print_r( $template );echo'</pre>'.__FILE__.' '.__LINE__;
-
-
         }
+        
         /**
          * Редактирования Breadcrumbs
          *
          * @since version
          */
-        protected function correctBreadcrumbs(){
+        public function correctBreadcrumbs(){
 //            $classname
 
             $body = $this->app->getBody();
@@ -273,9 +396,12 @@
             $dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
             $xpath = new \DOMXPath($dom);
             $Nodes = $xpath->query("//*[contains(@class, 'breadcrumbs')] //li//span[contains(@itemprop, 'name')]");
+            
+
+
             foreach ( $Nodes as $node) {
                 $node->nodeValue = $this->loadDataTemplate( $node->nodeValue ) ;
-//                echo'<pre>';print_r( $node->nodeValue  );echo'</pre>'.__FILE__.' '.__LINE__;
+ 
             }#END FOREACH
 
             $body =  $dom->saveHTML() ;
@@ -329,14 +455,14 @@
         }
 
         /**
-         * Кдалить мусор из тега ( h1 , title )
+         * Удалить мусор из тега ( h1 , title )
          * @param $tag
          *
          * @return string
          *
          * @since version
          */
-        private function _cleanTags( $tag ){
+        public function _cleanTags( $tag ){
             $searchArr = [
                 '()' ,
                 '[]' ,
