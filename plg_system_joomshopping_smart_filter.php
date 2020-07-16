@@ -102,14 +102,23 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
         JLoader::registerNamespace('SmartFilter',JPATH_PLUGINS.'/system/plg_system_joomshopping_smart_filter',$reset=false,$prepend=false,$type='psr4');
         $Helper = \SmartFilter\Helpers\Helper::instance( $this->params ) ;
 
+
+        if( $this->app->isClient( 'site' ) ){
+            $Optimises = \SmartFilter\Helpers\Optimises::instance( $this->params ) ;
+            $Optimises->downScript();
+        }
+
+
+
+
+
+
+
 		$Itemid = $this->app->input->get('Itemid' , false );
 		$format = $this->app->input->get('format' , false );
         $controller = $this->app->input->get('controller' , false );
 
-
-
-
-		if( !$Itemid || $format || ( $controller != 'category' && $controller != 'product' )  ) return; #END IF
+        if( !$Itemid || $format || ( $controller != 'category' && $controller != 'product' )  ) return; #END IF
 
 
         if ($controller == 'product') {
@@ -144,15 +153,15 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
         # Если параметры фильтра пустые - ставим ссылки на все сссылки
         if (empty ($filterData ) && $controller == 'category' ) {
             $this->_addLikToFilter();
-
         }else{
             # Поставить ссылки на все категории
             $this->_addLikToFilter( true );
         }#END IF
 
+        $Helper->TitleEdit( $filterData );
 
 
-          $Helper->TitleEdit( $filterData );
+
     }
 
     public function getRootParentCategory (){
@@ -166,7 +175,50 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
     }
 
 
+    /**
+     * Событие перед получением массива объектов продуктов
+     * @param $subject
+     * @param $adv_result
+     * @param $adv_from
+     * @param $adv_query string после WHERE
+     * @param $order_query
+     * @param $filters
+     *
+     *
+     * @since version
+     */
+    public function onBeforeQueryGetProductList( $type ,  &$adv_result, &$adv_from,  &$adv_query, &$order_query, &$filters ){
+        
+//        echo'<pre>';print_r( $adv_query );echo'</pre>'.__FILE__.' '.__LINE__;
+        
+        
+//        $adv_query  = " AND       pr_cat.`category_id` NOT IN  (  1230,66,835,1347,834,833,832,831,902,1440,1465,1547,1425,1426,1438,1427,1428,1429,1430,1434,1431,1436,1432,67,79,1238,69,1348,934,935,936,937,1384,1244,1245,1288,1287,1246,1385,1394,1395,1396,1397,1386,1398,1399,1400,1387,1401,1402,1403,1404,1388,1405,1406,1412,1407,1389,1408,1409,1413,1390,1414,1247,78,1415,1416,1417,1418,1419,1420,1421,1422,1423,1424,1235,1096,1061,1073,1476,1232,1345,947,987,145,142,1328,1233,68,1045,1342,82,1319,1365,1318,75,65  )  "  . $adv_query  ;
+//        echo'<pre>';print_r( $subject );echo'</pre>'.__FILE__.' '.__LINE__;
+//        echo'<pre>';print_r( $adv_query );echo'</pre>'.__FILE__.' '.__LINE__;
+//        die(__FILE__ .' '. __LINE__ );
 
+        return true;
+    }
+
+    /**
+     * Событие перед выводом товаров
+     * после события onBeforeQueryGetProductList
+     * @param $products
+     *
+     *
+     * @since version
+     */
+    public function onBeforeDisplayProductList( &$products ){
+        /*foreach ( $products as $i => $product) {
+            if ( $product->category_id == 75 || $product->category_id == 82 ) {
+                unset( $products [$i] ) ;
+            }#END IF
+        }#END FOREACH*/
+//        echo'<pre>';print_r( $products );echo'</pre>'.__FILE__.' '.__LINE__;
+//        die(__FILE__ .' '. __LINE__ );
+
+
+    }
 
 
 
@@ -251,10 +303,12 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
      */
     private function _addLikToFilter( $onlyCategory = false )
     {
+
         $body = $this->app->getBody();
         $dom = new \GNZ11\Document\Dom();
 
         $dom->loadHTML(mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8'));
+        $dom->loadHTML( $body );
         $xpath = new \DOMXPath($dom);
 
         if ($onlyCategory) {
@@ -262,9 +316,6 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
         }else{
             $Nodes = $xpath->query('//div[contains(@class , "uf_input")]/label');
         }#END IF
-        
-
-
 
         $new_A = $dom->createElement('a');
         $new_A->setAttribute('class', 'wrapper');
@@ -296,6 +347,9 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
                     $uri_Clone->setVar('manufacturers', $manufacturers);
                     # Создаем Ссылку
                     $currentUrl = $uri_Clone->toString(array('scheme', 'user', 'pass', 'host', 'port', 'path', 'query', 'fragment'));
+
+
+
 
                     break;
                 case 'categorys[]' :
@@ -333,19 +387,20 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
                     $currentUrl = $uri_Clone->toString(array('scheme', 'user', 'pass', 'host', 'port', 'path', 'query', 'fragment'));
             }
 
-           /* if ($name == 'categorys[]') {
-                continue;
-            }#END IF*/
-
-
             # Клонируем елемент
             $new_A_clone = $new_A->cloneNode();
             $new_A_clone->setAttribute('href', $currentUrl);
+            
             $labelElements_clone = $labelElements[0]->childNodes[0]->cloneNode(true);
             $labelElements[0]->childNodes[0]->parentNode->replaceChild($new_A_clone, $labelElements[0]->childNodes[0]);
             $new_A_clone->appendChild($labelElements_clone);
         }
-        $body = $dom->saveHTML();
+        $body = html_entity_decode( $dom->saveHTML() ) ;
+
         $this->app->setBody($body);
+
+
+
+
     }
 }

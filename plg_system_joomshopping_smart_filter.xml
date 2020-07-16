@@ -80,8 +80,9 @@
 					   filter="raw" >
 					<option value="">Please Select</option>
 					<option value="0">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG</option>
-					<option value="1">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_TITLE</option>
-					<option value="2">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_H_1_IN_PLG_IF_THERE_IS_NO_TEMPLATE_IN_TITLE</option>
+					<option value="1">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_META_TITLE_ONLY</option>
+					<option value="2">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_IN_TITLE</option>
+					<option value="3">PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_PROCESSING_RULES_IN_TITLE_IF_THERE_IS_NO_TEMPLATE</option>
 				</field>
 				<field name="template_title"
 					   type="textarea"

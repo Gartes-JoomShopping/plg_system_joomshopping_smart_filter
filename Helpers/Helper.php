@@ -118,8 +118,12 @@
             \JLoader::registerNamespace('CountryFilter',JPATH_PLUGINS.'/system/country_filter',$reset=false,$prepend=false,$type='psr4');
             $city = $this->app->input->get('sitecountry' , 'moskva' );
 
+
+
             # Получить даные для выбранного города
             $this->City =  ( \CountryFilter\Helpers\CitiesDirectory::getLocationByCityName( $city ) )['cities'] ;
+
+
 
             $CategoryTable = $this->getCatrgory();
 
@@ -171,6 +175,8 @@
                 }
             }#END IF
 
+
+
             /*echo'<pre>';print_r( '-'.$this->FilterStringParam.'-' );echo'</pre>'.__FILE__.' '.__LINE__;
             die(__FILE__ .' '. __LINE__ );*/
 
@@ -188,87 +194,66 @@
              * Обработка тэга h1
              */
             $processing_rules_h1 = $this->params->get('processing_rules_h1', 0 );
-            switch ($processing_rules_h1){
-                case 1 :
-                    break ;
-                case 2 :
-                    die(__FILE__ .' '. __LINE__ );
+            $key = array_search('{H1}', $this->pregArr);
+            $arrSearch = $this->getArrSearchForClean() ;
+            foreach ($this->dataForCategoryH1 as $i => $item) {
+                $this->dataForCategoryH1[$i] = str_replace( $arrSearch , '' , $item ) ;
+            }#END FOREACH
 
-                    break;
-                default:
-                    $arrSearch = $this->getArrSearchForClean() ;
-                    $key = array_search('{H1}', $this->pregArr);
-
-                    foreach ($this->dataForCategoryH1 as $i => $item) {
-                        $this->dataForCategoryH1[$i] = str_replace( $arrSearch , '' , $item ) ;
-                    }#END FOREACH
-
-                    $template_h1 = $this->params->get('template_h1', false );
-                    $this->h1 = $this->loadDataTemplate( $template_h1 ,  $this->dataForCategoryH1 ) ;
-                    $this->setContentNode('h1', $this->h1 );
-                    $this->dataForCategoryH1[ $key ] =  $this->h1  ;
-            }
-            #Если тэг h1 пустой загружаем шаблон из настроек плагина
-            # Иначе принимаем тэг h1 как шаблон
-//            $h1 = $this->getContentNode('h1');
-
-//            echo'<pre>';print_r( $processing_rules_h1 );echo'</pre>'.__FILE__.' '.__LINE__;
-
-//            die(__FILE__ .' '. __LINE__ );
-
-//            if (empty($h1)) {
-////
-//            }else{
-//                $title = $CategoryTable->{$lang->get('name')};
-//                $template_h1 = $title ;
-//            }#END IF
-
-            # Создание создание h1
-
-            /*$data_H1 = [
-                $this->RootCategory,
-                $this->ParentCategory,
-                $this->CurrentCategory,
-                '',
-                $this->City,
-                $this->FilterStringParam,
-            ];*/
 
 
             
+
+            switch ($processing_rules_h1){
+                case 1 :
+                    $template_h1 = $CategoryTable->{$lang->get('name')};
+                    break ;
+                case 2 :
+                    $template_h1 = $CategoryTable->{$lang->get('name')};
+                    $pos = \GNZ11\Document\Text::strpos_array($template_h1 , $this->pregArr ) ;
+                    if (!$pos) {
+                        $template_h1 = $this->params->get('template_h1', false );
+                    }#END IF
+
+                    break;
+                default:
+                    $template_h1 = $this->params->get('template_h1', false );
+            }
+
+            $this->h1 = $this->loadDataTemplate( $template_h1 ,  $this->dataForCategoryH1 ) ;
+
+
+            $this->setContentNode('h1', $this->h1 );
+            $this->dataForCategoryH1[ $key ] =  $this->h1  ;
+
+
+
             $processing_rules_title = $this->params->get('processing_rules_title', 0 );
             switch ($processing_rules_title){
                 case 1 :
+                    $template_Title = $CategoryTable->{$lang->get('meta_title')};
+
                     break ;
                 case 2 :
+                    $template_Title = $CategoryTable->{$lang->get('meta_title')};
+                    if (empty( $template_Title )) {
+                        $template_Title = $this->params->get('template_title', false );
+                    }#END IF
+                    break ;
+                case 3 :
+                    $template_Title = $CategoryTable->{$lang->get('meta_title')};
+                    $pos = \GNZ11\Document\Text::strpos_array($template_Title , $this->pregArr ) ;
+                    if (!$pos) {
+                        $template_Title = $this->params->get('template_title', false );
+                    }#END IF
                     break ;
                 default :
                     $template_Title = $this->params->get('template_title', false );
-                    $this->Title = $this->loadDataTemplate( $template_Title ,  $this->dataForCategoryH1 ) ;
-                    $this->setContentNode('title', $this->Title );
             }
+            $this->Title = $this->loadDataTemplate( $template_Title ,  $this->dataForCategoryH1 ) ;
+            $this->setContentNode('title', $this->Title );
 
 
-
-
-
-            # Создание тайтла
-//            $title = $this->getContentNode('title');
-            $title = $CategoryTable->{$lang->get('meta_title')};
-
-
-
-            /*if (empty($title)) {
-
-                $template_Title = $this->params->get('template_title', $title);
-                $this->Title = $this->loadDataTemplate( $template_Title ) ;
-//                $this->Title = str_replace($this->pregArr, $data, $template_Title);
-//                $this->Title = $this->_cleanTags($this->Title);
-                $this->setContentNode('title', $this->Title);
-            }else{
-                $this->Title = $this->loadDataTemplate( $title ) ;
-                $this->setContentNode('title', $this->Title );
-            }*/
 
             $processing_rules_description = $this->params->get('processing_rules_description', 0 );
             switch ($processing_rules_description){
@@ -288,10 +273,11 @@
                 case 3 :
                     $template_description = $CategoryTable->{$lang->get('meta_description')} ;
                     $pos = \GNZ11\Document\Text::strpos_array($template_description , $this->pregArr) ;
-                    echo'<pre>';print_r( $pos );echo'</pre>'.__FILE__.' '.__LINE__;
-                    die(__FILE__ .' '. __LINE__ );
-
-
+                    if (!$pos) {
+                        $template_description = $this->params->get('template_description', false );
+                    }#END IF
+                    $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
+                    $this->setContentNode('description', $this->Description );
                     break ;
                 default :
                     $template_description = $this->params->get('template_description', false );
@@ -299,21 +285,6 @@
                     $this->setContentNode('description', $this->Description );
             }
 
-//            $description = $this->getContentNode('description');
-            /*$description = $CategoryTable->{$lang->get('meta_description')};
-            if (empty($description)) {
-                $template_Description = $this->params->get('template_description', $description);
-                $this->Description = $this->loadDataTemplate( $template_Description ) ;
-
-//                $this->Description = str_replace($this->pregArr, $data, $template_Description);
-//                $this->Description = $this->_cleanTags($this->Description);
-                $this->setContentNode('description', $this->Description);
-            }else{
-                $this->Description = $this->loadDataTemplate( $description ) ;
-                $this->setContentNode('description', $this->Description);
-            }
-
-            */
 
             if ( $this->params->get('process_breadcrumbs', 0 ) ) {
                 $this->correctBreadcrumbs();
@@ -448,10 +419,16 @@
                 $this->RootCategory = $PathwayNamesArr[1] ;
             }#END IF
 
+
+
+
             if ( $CategoryTable->{'name_ru-RU'} != $this->RootCategory ) {
                 // текушая категория
                 $this->CurrentCategory = $CategoryTable->{'name_ru-RU'} ;
+            }else{
+                $this->CurrentCategory = $this->RootCategory ;
             }#END IF
+
         }
 
         /**
@@ -479,9 +456,11 @@
 		 * @since version
 		 */
 		public function setContentNode( $nodeName , $content ){
-			$body = $this->app->getBody();
+
+		    $body = $this->app->getBody();
 			$dom = new \GNZ11\Document\Dom();
-			$dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
+//			$dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
+			$dom->loadHTML(   $body   );
             if ( $nodeName == 'description') {
                 $metas = $dom->getElementsByTagName('meta');
                 foreach ($metas as $meta) {
@@ -505,6 +484,7 @@
 		 * @since version
 		 */
 		public function getContentNode( $nodeName ){
+
 			$body = $this->app->getBody();
 			$dom = new \GNZ11\Document\Dom();
 			$dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
