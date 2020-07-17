@@ -221,12 +221,10 @@
             }
 
             $this->h1 = $this->loadDataTemplate( $template_h1 ,  $this->dataForCategoryH1 ) ;
-
-
             $this->setContentNode('h1', $this->h1 );
             $this->dataForCategoryH1[ $key ] =  $this->h1  ;
 
-
+            return ;
 
             $processing_rules_title = $this->params->get('processing_rules_title', 0 );
             switch ($processing_rules_title){
@@ -253,22 +251,16 @@
             $this->Title = $this->loadDataTemplate( $template_Title ,  $this->dataForCategoryH1 ) ;
             $this->setContentNode('title', $this->Title );
 
-
-
             $processing_rules_description = $this->params->get('processing_rules_description', 0 );
             switch ($processing_rules_description){
                 case 1 :
                     $template_description = $CategoryTable->{$lang->get('meta_description')} ;
-                    $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
-                    $this->setContentNode('description', $this->Description );
                     break ;
                 case 2 :
                     $template_description = $CategoryTable->{$lang->get('meta_description')} ;
                     if (empty( $template_description ) ) {
                         $template_description = $this->params->get('template_description', false );
                     }#END IF
-                    $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
-                    $this->setContentNode('description', $this->Description );
                     break ;
                 case 3 :
                     $template_description = $CategoryTable->{$lang->get('meta_description')} ;
@@ -276,14 +268,14 @@
                     if (!$pos) {
                         $template_description = $this->params->get('template_description', false );
                     }#END IF
-                    $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
-                    $this->setContentNode('description', $this->Description );
                     break ;
                 default :
                     $template_description = $this->params->get('template_description', false );
-                    $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
-                    $this->setContentNode('description', $this->Description );
             }
+            $this->Description = $this->loadDataTemplate( $template_description ,  $this->dataForCategoryH1 ) ;
+            $this->setContentNode('description', $this->Description );
+
+
 
 
             if ( $this->params->get('process_breadcrumbs', 0 ) ) {
@@ -447,6 +439,26 @@
             return trim( str_replace(  $searchArr ,'', $tag ) ) ;
         }
 
+
+        public function fixAmps(&$html, $offset)
+        {
+            $positionAmp = strpos($html, '&', $offset);
+            $positionSemiColumn = strpos($html, ';', $positionAmp + 1);
+
+            $string = substr($html, $positionAmp, $positionSemiColumn - $positionAmp + 1);
+
+            if ($positionAmp !== false) { // If an '&' can be found.
+                if ($positionSemiColumn === false) { // If no ';' can be found.
+                    $html = substr_replace($html, '&amp;', $positionAmp, 1); // Replace straight away.
+                } else if (preg_match('/&(#[0-9]+|[A-Z|a-z|0-9]+);/', $string) === 0) { // If a standard escape cannot be found.
+                    $html = substr_replace($html, '&amp;', $positionAmp, 1); // This mean we need to escapa the '&' sign.
+                    $this->fixAmps($html, $positionAmp + 5); // Recursive call from the new position.
+                } else {
+                    $this->fixAmps($html, $positionAmp + 1); // Recursive call from the new position.
+                }
+            }
+        }
+
 		/**
 		 * Установить новое значение для тега
 		 * @param $nodeName string Название тега
@@ -457,10 +469,20 @@
 		 */
 		public function setContentNode( $nodeName , $content ){
 
-		    $body = $this->app->getBody();
+		    $body =  $this->app->getBody() ;
+
+//		    $this->fixAmps($body, 0 );
+
+
+
 			$dom = new \GNZ11\Document\Dom();
 //			$dom->loadHTML( mb_convert_encoding( $body , 'HTML-ENTITIES', 'UTF-8' ) );
-			$dom->loadHTML(   $body   );
+
+
+			 $dom->loadHTML(     $body     );
+
+
+
             if ( $nodeName == 'description') {
                 $metas = $dom->getElementsByTagName('meta');
                 foreach ($metas as $meta) {
@@ -472,7 +494,10 @@
                 $dom->getElementsByTagName( $nodeName )->item(0)->nodeValue = $content;
             }#END IF
 
-			$body =  $dom->saveHTML() ;
+			$body =    $dom->saveHTML()   ;
+
+
+
 			$this->app->setBody( $body ) ;
 		}
 

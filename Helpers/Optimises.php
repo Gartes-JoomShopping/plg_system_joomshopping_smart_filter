@@ -26,7 +26,7 @@ class Optimises
     private $db;
     public static $instance;
     private $_scriptCollection = [] ;
-    private $_scriptDeclarationCollection = '' ;
+    private $_scriptDeclarationCollection = [] ;
 
     /**
      * helper constructor.
@@ -58,26 +58,68 @@ class Optimises
     public function downScript(){
         $body                = $this->app->getBody();
 
+
         # Найти все скрипты в теле страницы
         $dom = new \GNZ11\Document\Dom();
+
+
         $dom->loadHTML($body) ;
         $xpath       = new \DOMXPath( $dom );
         $scriptNodes = $xpath->query( "*//script" );
-        foreach ( $scriptNodes as $scriptNode) {
-            $attr = $dom->getAttrElement( $scriptNode );
+        foreach ( $scriptNodes as $i => $scriptNode) {
+            #Получить атрибуты
+            $excludeAttr=[];
+            $attr = $dom::getAttrElement( $scriptNode , $excludeAttr ) ;
+
             if ( isset( $attr['src'] ) ) {
-                $this->_scriptCollection[] = $attr  ;
+                $key =  md5( $attr['src'] ) ;
+                $this->_scriptCollection[ $key ] = $attr  ;
+
+
+
             }else{
-                $this->_scriptDeclarationCollection .= $scriptNode->nodeValue ;
+                $key =  md5($scriptNode->nodeValue) ;
+                switch ( $attr['type'] ){
+                    case 'application/json':
+                        $type = $attr['type'] ;
+                        $this->_scriptDeclarationCollection[$type][$key]['nodeValue'] = $scriptNode->nodeValue ;
+                        $this->_scriptDeclarationCollection[$type][$key]['attr'] = $attr ;
+                        break ;
+                    default :
+                        $this->_scriptDeclarationCollection['javascript'][ $key ] = $scriptNode->nodeValue ;
+                }
             }#END IF
 
+            $scriptNode->parentNode->removeChild($scriptNode);
 
 
-//            echo'<pre>';print_r( $attr );echo'</pre>'.__FILE__.' '.__LINE__;
+
         }#END FOREACH
 
-//        echo'<pre>';print_r( $this->_scriptCollection );echo'</pre>'.__FILE__.' '.__LINE__;
-//        die(__FILE__ .' '. __LINE__ );
+
+        foreach ($this->_scriptDeclarationCollection['application/json'] as $item) {
+            try {
+                \GNZ11\Document\Dom::writeDownTag('script', $item['nodeValue'], $item['attr']);
+            } catch (\Exception $e) {
+                echo'<pre>';print_r( $e );echo'</pre>'.__FILE__.' '.__LINE__;
+                die(__FILE__ .' '. __LINE__ );
+            }
+        }#END FOREACH
+        $scriptDeclaration = implode("\r\n" , $this->_scriptDeclarationCollection['javascript'] ) ;
+        \GNZ11\Document\Dom::writeDownTag('script', $scriptDeclaration  );
+
+        foreach ( $this->_scriptCollection as $item) {
+            \GNZ11\Document\Dom::writeDownTag('script', '',  $item );
+        }#END FOREACH
+
+        /*echo'<pre>';print_r( $this->_scriptCollection );echo'</pre>'.__FILE__.' '.__LINE__;
+        die(__FILE__ .' '. __LINE__ );*/
+
+
+
+
+//        $body =   $dom->saveHTML() ;
+//        $this->app->setBody($body);
 
 
     }

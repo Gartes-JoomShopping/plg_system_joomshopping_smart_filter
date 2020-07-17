@@ -99,31 +99,28 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 	 */
 	public function onAfterRender()
 	{
+
         JLoader::registerNamespace('SmartFilter',JPATH_PLUGINS.'/system/plg_system_joomshopping_smart_filter',$reset=false,$prepend=false,$type='psr4');
         $Helper = \SmartFilter\Helpers\Helper::instance( $this->params ) ;
 
+        $Itemid = $this->app->input->get('Itemid' , false );
+        $format = $this->app->input->get('format' , false );
+        $controller = $this->app->input->get('controller' , false );
 
+        if( !$Itemid || $format) return; #END IF
+
+        /**
+         * Оптимизация скриптов опускаем в низ
+         */
         if( $this->app->isClient( 'site' ) ){
             $Optimises = \SmartFilter\Helpers\Optimises::instance( $this->params ) ;
-            $Optimises->downScript();
+//            $Optimises->downScript();
         }
-
-
-
-
-
-
-
-		$Itemid = $this->app->input->get('Itemid' , false );
-		$format = $this->app->input->get('format' , false );
-        $controller = $this->app->input->get('controller' , false );
 
         if( !$Itemid || $format || ( $controller != 'category' && $controller != 'product' )  ) return; #END IF
 
-
         if ($controller == 'product') {
             $Helper->cleanCode();
-
             return;
         }#END IF
 
@@ -152,13 +149,14 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 
         # Если параметры фильтра пустые - ставим ссылки на все сссылки
         if (empty ($filterData ) && $controller == 'category' ) {
+
             $this->_addLikToFilter();
         }else{
             # Поставить ссылки на все категории
             $this->_addLikToFilter( true );
         }#END IF
 
-        $Helper->TitleEdit( $filterData );
+//        $Helper->TitleEdit( $filterData );
 
 
 
@@ -303,12 +301,9 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
      */
     private function _addLikToFilter( $onlyCategory = false )
     {
-
         $body = $this->app->getBody();
         $dom = new \GNZ11\Document\Dom();
-
-        $dom->loadHTML(mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8'));
-        $dom->loadHTML( $body );
+        $dom->loadHTML(   $body   );
         $xpath = new \DOMXPath($dom);
 
         if ($onlyCategory) {
@@ -319,7 +314,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 
         $new_A = $dom->createElement('a');
         $new_A->setAttribute('class', 'wrapper');
-        $new_A->setAttribute('', 'wrapper');
+//        $new_A->setAttribute('', 'wrapper');
 
         $uri = \Joomla\CMS\Uri\Uri::getInstance();
         $characteristics_Var = $uri->getVar('characteristics');
@@ -395,7 +390,10 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
             $labelElements[0]->childNodes[0]->parentNode->replaceChild($new_A_clone, $labelElements[0]->childNodes[0]);
             $new_A_clone->appendChild($labelElements_clone);
         }
-        $body = html_entity_decode( $dom->saveHTML() ) ;
+        $body =  $dom->saveHTML() ;
+
+
+
 
         $this->app->setBody($body);
 
