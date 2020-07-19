@@ -224,7 +224,7 @@
             $this->setContentNode('h1', $this->h1 );
             $this->dataForCategoryH1[ $key ] =  $this->h1  ;
 
-            return ;
+
 
             $processing_rules_title = $this->params->get('processing_rules_title', 0 );
             switch ($processing_rules_title){

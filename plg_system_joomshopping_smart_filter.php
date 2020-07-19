@@ -109,13 +109,55 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 
         if( !$Itemid || $format) return; #END IF
 
+
+
+
+        /**
+         * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+         */
         /**
          * Оптимизация скриптов опускаем в низ
          */
         if( $this->app->isClient( 'site' ) ){
-            $Optimises = \SmartFilter\Helpers\Optimises::instance( $this->params ) ;
-//            $Optimises->downScript();
-        }
+            if ($this->params->get('optimises_on' , 0 )) {
+
+                $client = new \Joomla\Application\Web\WebClient();
+                $platform = $client->__get('platform');
+                $mobile = $client->__get('mobile');
+                $top_menu_selector = ($mobile?'#divId div#top_menu': '.mycategoryBlocks>ul.menu');
+
+
+
+
+
+
+                $Optimises = \GNZ11\Api\Optimize\Optimises::instance( $this->params ) ;
+                $Optimises->setParams([
+                    'my_name' => 'HtmlOptimizer' ,
+                    # Переносить скрипты вниз страницы : Bool
+                    'downScript' => $this->params->get('downScript' , 0 ) ,
+                    'preload'=>[],
+                    'not_load'=>[],
+                    # обварачивать элементы в тег <template /> : Array
+                    'to_templates'=>[
+                        $top_menu_selector => [],
+                    ],
+                    'to_html_file'=>[],
+                ] );
+                $Optimises->Start();
+
+
+
+            }#END IF
+        }#END IF
+        /**
+         * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+         */
+
+
+
+
+
 
         if( !$Itemid || $format || ( $controller != 'category' && $controller != 'product' )  ) return; #END IF
 
@@ -156,7 +198,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
             $this->_addLikToFilter( true );
         }#END IF
 
-//        $Helper->TitleEdit( $filterData );
+        $Helper->TitleEdit( $filterData );
 
 
 

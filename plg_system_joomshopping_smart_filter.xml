@@ -139,13 +139,46 @@
 					<option value="0">JNO</option>
 				</field>
 				
-				 
-				
+
+				<field name="Optimizer.dsdf"
+					type="text"
+					default=""
+					class="Optimizerdsdf "
+					readonly=""
+					required=""
+					label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_OPTIMIZER_DSDF"
+					description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_OPTIMIZER_DSDF_DESC"
+					showon=""
+					hint=""
+					filter="raw" />
+			</fieldset>
+			<fieldset name="optimises">
+				<field name="optimises_on"
+					   type="radio"
+					   default="0"
+					   label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_OPTIMISES_ON"
+					   description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_OPTIMISES_ON_DESC"
+					   class="btn-group btn-group-yesno">
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
+				<field name="downScript"
+					   type="radio"
+					   default="0"
+					   label="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_DOWN_SCRIPT"
+					   description="PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_DOWN_SCRIPT_DESC"
+					   class="btn-group btn-group-yesno"
+					   showon="optimises_on:1"
+				>
+					<option value="1">JYES</option>
+					<option value="0">JNO</option>
+				</field>
 
 
-					
+
 			</fieldset>
 		</fields>
+
 	</config>
 
 	<!-- Update servers -->
