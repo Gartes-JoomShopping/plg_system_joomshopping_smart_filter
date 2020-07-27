@@ -106,7 +106,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
         $Itemid = $this->app->input->get('Itemid' , false );
         $format = $this->app->input->get('format' , false );
         $controller = $this->app->input->get('controller' , false );
-
+        $paginationStart = $this->app->input->get('start' , false );
         if( !$Itemid || $format) return; #END IF
 
 
@@ -188,6 +188,12 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
         $Helper->_checkCategory() ;
 
 
+
+
+        
+
+        # Если переход по пагинации
+        if ($paginationStart)  return; #END IF
 
         # Если параметры фильтра пустые - ставим ссылки на все сссылки
         if (empty ($filterData ) && $controller == 'category' ) {
