@@ -124,7 +124,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
                 $client = new \Joomla\Application\Web\WebClient();
                 $platform = $client->__get('platform');
                 $mobile = $client->__get('mobile');
-                $top_menu_selector = ($mobile?'#divId div#top_menu': '.mycategoryBlocks>ul.menu');
+                $top_menu_selector = ($mobile?'#divId div#top_menu>div': '.mycategoryBlocks>ul.menu');
 
 
 
