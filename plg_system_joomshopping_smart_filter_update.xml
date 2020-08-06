@@ -65,7 +65,7 @@
         <type>plugin</type>
         <folder>system</folder>
         <element>plg_system_joomshopping_smart_filter</element>
-        <version>1.7</version>
+        <version>1.8</version>
         <client>0</client>
         <infourl title="github.com">https://github.com/Gartes-JoomShopping/plg_system_joomshopping_smart_filter</infourl>
         <downloads>
