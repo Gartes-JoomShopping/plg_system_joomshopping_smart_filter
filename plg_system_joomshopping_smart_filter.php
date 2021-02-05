@@ -121,10 +121,10 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
         if( $this->app->isClient( 'site' ) ){
             if ($this->params->get('optimises_on' , 0 )) {
 
-                $client = new \Joomla\Application\Web\WebClient();
+                /*$client = new \Joomla\Application\Web\WebClient();
                 $platform = $client->__get('platform');
                 $mobile = $client->__get('mobile');
-                $top_menu_selector = ($mobile?'#divId div#top_menu>div': '.mycategoryBlocks>ul.menu');
+                $top_menu_selector = ($mobile ? '#divId div#top_menu>div' : '.mycategoryBlocks>ul.menu');
 
 
 
@@ -144,7 +144,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
                     ],
                     'to_html_file'=>[],
                 ] );
-                $Optimises->Start();
+                $Optimises->Start();*/
 
 
 
@@ -274,7 +274,7 @@ class plgSystemPlg_system_joomshopping_smart_filter extends CMSPlugin
 //			return true ;
 		}#END IF
 		if(  $this->app->isClient( 'site' ) ) return false; #END IF
-		$this->app->enqueueMessage( \Joomla\CMS\Language\Text::_('PLG_SYSTEM_PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_CHECK_GNZ11') );
+//		    $this->app->enqueueMessage( \Joomla\CMS\Language\Text::_('PLG_SYSTEM_PLG_SYSTEM_JOOMSHOPPING_SMART_FILTER_CHECK_GNZ11') );
 		return false ;
 
 	}
